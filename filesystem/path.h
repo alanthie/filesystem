@@ -340,7 +340,7 @@ inline bool create_directory(const path& p)
 }
 
 #if defined(_WIN32)
-std::vector<std::string> get_directory_file(const path& p)
+std::vector<std::string> get_directory_file(const path& p, bool recursive = false)
 {
     std::vector<std::string> files;
     if (p.empty()) return files;
@@ -353,13 +353,29 @@ std::vector<std::string> get_directory_file(const path& p)
     struct dirent *dirent_ptr;
     if (!directory_ptr)
     {
-        //throw...
+        // throw...
         return files;
     }
 
     while ((dirent_ptr = readdir(directory_ptr.get())) != nullptr)
     {
-        files.push_back(std::string(dirent_ptr->d_name));
+        if ((std::string(dirent_ptr->d_name) != ".") && (std::string(dirent_ptr->d_name) != ".."))
+        {
+            path pt = p / path(std::string(dirent_ptr->d_name));
+            files.push_back(pt.make_absolute().str());
+            if (recursive)
+            {
+                path pv = files.at(files.size()-1);
+                if (pv.is_directory())
+                {
+                    std::vector<std::string> f = get_directory_file(pv, true);
+                    for (size_t i = 0; i < f.size(); i++)
+                    {
+                        files.push_back(f[i]);
+                    }
+                }
+            }
+        }
     }
     return files;
 }

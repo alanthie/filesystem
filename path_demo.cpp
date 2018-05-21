@@ -47,11 +47,12 @@ int main(int argc, char **argv)
     cout << "resolve(nonexistant) = " << resolver().resolve("nonexistant") << endl;
 
     {
-        path p = path("../filesystem");
-        std::vector<std::string> v = filesystem::get_directory_file(p);
+        path p = path("../filesystem//..");
+        std::vector<std::string> v = filesystem::get_directory_file(p, false);
         for (size_t i = 0; i < v.size(); i++)
         {
-            cout << "dir:" << p.make_absolute() << " has :" << v .at(i) << endl;
+            //path pv = v.at(i);
+            cout << "dir:" << p.make_absolute() << " has :" << v .at(i) /*<< (pv.is_directory()?" dir" : " file") */<< endl;
         }
     }
     return 0;
