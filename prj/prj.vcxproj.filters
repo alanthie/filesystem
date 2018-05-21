@@ -24,9 +24,6 @@
     <ClInclude Include="..\filesystem\resolver.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\windirent.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\path_demo.cpp">
