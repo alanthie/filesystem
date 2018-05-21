@@ -3,3 +3,6 @@
 This class is just a temporary workaround to avoid the heavy boost dependency
 until `boost::filesystem` is integrated into the standard template library at
 some point in the future.
+
+New:
+Add windows dirent.h to list content of a folder
