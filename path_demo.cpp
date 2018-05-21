@@ -1,9 +1,29 @@
 #include <iostream>
 #include "filesystem/path.h"
 #include "filesystem/resolver.h"
+#include "windirent.h"
+#include <memory>
 
 using namespace std;
 using namespace filesystem;
+
+std::vector<std::string> GetDirectoryFiles(const std::string& dir) 
+{
+    std::vector<std::string> files;
+    std::shared_ptr<DIR> directory_ptr(opendir(dir.c_str()), [](DIR* dir) { dir && closedir(dir); });
+    struct dirent *dirent_ptr;
+    if (!directory_ptr) 
+    {
+        //std::cout << "Error opening : " << std::strerror(errno) << dir << std::endl;
+        return files;
+    }
+
+    while ((dirent_ptr = readdir(directory_ptr.get())) != nullptr) 
+    {
+        files.push_back(std::string(dirent_ptr->d_name));
+    }
+    return files;
+}
 
 int main(int argc, char **argv) {
 #if !defined(WIN32)
@@ -44,5 +64,15 @@ int main(int argc, char **argv) {
 
     cout << "resolve(filesystem/path.h) = " << resolver().resolve("filesystem/path.h") << endl;
     cout << "resolve(nonexistant) = " << resolver().resolve("nonexistant") << endl;
+
+    path p = path("../filesystem").make_absolute();
+    if (p.is_directory())
+    {
+        std::vector<std::string> v = GetDirectoryFiles(p.make_absolute().str());
+        for (size_t i = 0; i < v.size(); i++)
+        {
+            cout << "dir:" << p.make_absolute() << " has :" << v .at(i) << endl;
+        }
+    }
     return 0;
 }

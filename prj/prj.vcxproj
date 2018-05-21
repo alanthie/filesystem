@@ -114,6 +114,7 @@
     <ClInclude Include="..\filesystem\fwd.h" />
     <ClInclude Include="..\filesystem\path.h" />
     <ClInclude Include="..\filesystem\resolver.h" />
+    <ClInclude Include="..\windirent.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\path_demo.cpp" />
