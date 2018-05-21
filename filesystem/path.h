@@ -21,6 +21,8 @@
 
 #if defined(_WIN32)
 # include <windows.h>
+#include "windirent.h"
+#include <memory>
 #else
 # include <unistd.h>
 #endif
@@ -328,12 +330,39 @@ protected:
     bool m_absolute;
 };
 
-inline bool create_directory(const path& p) {
+inline bool create_directory(const path& p)
+{
 #if defined(_WIN32)
     return CreateDirectoryW(p.wstr().c_str(), NULL) != 0;
 #else
     return mkdir(p.str().c_str(), S_IRUSR | S_IWUSR | S_IXUSR) == 0;
 #endif
 }
+
+#if defined(_WIN32)
+std::vector<std::string> get_directory_file(const path& p)
+{
+    std::vector<std::string> files;
+    if (p.empty()) return files;
+    if (!p.exists()) return files;
+    if (!p.is_directory()) return files;
+
+    std::string dir = p.make_absolute().str();
+
+    std::shared_ptr<DIR> directory_ptr(opendir(dir.c_str()), [](DIR* dir) { dir && closedir(dir); });
+    struct dirent *dirent_ptr;
+    if (!directory_ptr)
+    {
+        //throw...
+        return files;
+    }
+
+    while ((dirent_ptr = readdir(directory_ptr.get())) != nullptr)
+    {
+        files.push_back(std::string(dirent_ptr->d_name));
+    }
+    return files;
+}
+#endif
 
 NAMESPACE_END(filesystem)
